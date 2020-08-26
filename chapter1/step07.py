@@ -69,3 +69,21 @@ assert y.creator.input.creator == B
 assert y.creator.input.creator.input == a
 assert y.creator.input.creator.input.creator == A
 assert y.creator.input.creator.input.creator.input == x
+
+# 逆伝播を試す
+y.grad = np.array(1.0)
+
+# --- 一番お尻 ---
+C = y.creator # 1. 関数を取得
+b = C.input # 2. 関数の入力値を取得
+b.grad = C.backward(y.grad) # 3. 関数のbackwordメソッドを呼ぶ
+# --- その次 ---
+B = b.creator # 1. 関数を取得
+a = B.input # 2. 関数の入力値を取得
+a.grad = B.backward(b.grad) # 3. 関数のbackwordメソッドを呼ぶ
+# --- その次 ---
+A = a.creator 
+x = A.input
+x.grad = A.backward(a.grad)
+
+print(x.grad)
