@@ -9,6 +9,13 @@ class Variable:
     
     def set_creator(self, func):
         self.creator = func 
+    
+    def backward(self):
+        f = self.creator # 1. 関数を取得
+        if f is not None:
+            x = f.input # 2. 関数のinputを取得
+            x.grad = f.backward(self.grad) # 3. 関数のbackwardメソッドを呼ぶ
+            x.backward() # 自分より１つ前の変数のbackwardメソッドを呼ぶ（再帰）    
 
 class Function:
     def __call__(self, input):
