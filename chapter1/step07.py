@@ -69,7 +69,12 @@ x = Variable(np.array(0.5))
 a = A(x)
 b = B(a)
 y = C(b)
+# 逆伝播
+y.grad = np.array(1.0)
+y.backward()
+print(x.grad)
 
+print('checking implementation...')
 assert y.creator == C
 assert y.creator.input == b
 assert y.creator.input.creator == B
@@ -77,6 +82,8 @@ assert y.creator.input.creator.input == a
 assert y.creator.input.creator.input.creator == A
 assert y.creator.input.creator.input.creator.input == x
 
+print('checking is complete')
+print('calculate gradient by myself')
 # 逆伝播を試す
 y.grad = np.array(1.0)
 
