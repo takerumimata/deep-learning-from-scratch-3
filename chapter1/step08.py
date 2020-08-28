@@ -16,8 +16,8 @@ class Variable:
             f = funcs.pop() # 関数を取得
             x, y = f.input, f.output # 関数の入出力を取得
             x.grad = f.backward(y.grad) # backwardメソッドを呼ぶ
-        if x.creator is not None:
-            funcs.append(x.creator) # 1つ前の関数をリストに追加
+            if x.creator is not None:
+                funcs.append(x.creator) # 1つ前の関数をリストに追加
 
 class Function:
     def __call__(self, input):
