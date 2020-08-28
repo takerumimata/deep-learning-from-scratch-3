@@ -70,9 +70,7 @@ def exp(x):
     return Exp()(x)
 
 x = Variable(np.array(0.5))
-a = square(x)
-b = exp(a)
-y = square(b)
+y = square(exp(square(x)))
 # 逆伝播
 y.grad = np.array(1.0)
 y.backward()
