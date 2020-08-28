@@ -62,6 +62,14 @@ class Exp(Function):
         gx = np.exp(x) * gy
         return gx
 
+def numerical_diff(f, x, eps=1e-4):
+    x0 = Variable(x.data - eps)
+    x1 = Variable(x.data + eps)
+    y0 = f(x0)
+    y1 = f(x1)
+    return (y1.data - y0.data) / (2*eps)
+
+
 class SquareTest(unittest.TestCase):
     def test_forward(self):
         x = Variable(np.array(2.0))
@@ -77,19 +85,12 @@ class SquareTest(unittest.TestCase):
         self.assertEqual(x.grad, expected)
 
     def test_gradient_check(self):
-        x = Variavle(np.random.rand(1)) # ランダムな入力値を生成
+        x = Variable(np.random.rand(1)) # ランダムな入力値を生成
         y = square(x)
         y.backward()
         num_grad = numerical_diff(square, x)
         flg = np.allclose(x.grad, num_grad)
         self.assertTrue(flg)
-
-def numerical_diff(f, x, eps=1e-4):
-    x0 = (x.data - eps)
-    x1 = (x.data + eps)
-    y0 = f(x0)
-    y1 = f(x1)
-    return (y1.data - y0.data) / (2*eps)
 
 def square(x):
     return Square()(x)  # squareクラスをわざわざ生成するのがめんどくさいので、pythonのメソッドとして定義する。
