@@ -11,6 +11,8 @@ class Variable:
         self.creator = func 
     
     def backward(self):
+        if self.grad is None:
+            self.grad = np.ones_like(self.data)
         funcs = [self.creator] 
         while funcs:
             f = funcs.pop() # 関数を取得
@@ -72,7 +74,6 @@ def exp(x):
 x = Variable(np.array(0.5))
 y = square(exp(square(x)))
 # 逆伝播
-y.grad = np.array(1.0)
 y.backward()
 print(x.grad)
 
