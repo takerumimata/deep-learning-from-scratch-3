@@ -26,20 +26,23 @@ class Variable:
                 funcs.append(x.creator) # 1つ前の関数をリストに追加
 
 class Function:
-    def __call__(self, input):
-        x = input.data
-        y = self.forward(x)
-        output = Variable(as_array(y))
-        output.set_creator(self) # 出力変数に生みのおやを覚えさせる
-        self.input = input
-        self.output = output # 出力も覚える
-        return output
+    def __call__(self, inputs):
+        xs = [x.data for x in inputs]
+        ys = self.forward(xs)
+        outputs = [Variable(as_array(y)) for y in ys]
 
-    def forward(self, x):
+        for output in outputs:
+            output.set_creator(self)
+
+        self.inputs = inputs
+        self.outputs = outputs # 出力も覚える
+        return outputs
+
+    def forward(self, xs):
         raise NotImplementedError()
 
     # @staticmethod
-    def backward(self, gy):
+    def backward(self, gys):
         raise NotImplementedError()
 
 class Square(Function):
@@ -92,6 +95,12 @@ class SquareTest(unittest.TestCase):
         flg = np.allclose(x.grad, num_grad)
         self.assertTrue(flg)
 
+class Add(Function):
+    def forward(self, xs):
+        x0, x1 = xs # 加算は２つの数を扱うので、受け取る数は常に２つ
+        y = x0 + x1
+        return (y,) # タプルを返す
+
 def square(x):
     return Square()(x)  # squareクラスをわざわざ生成するのがめんどくさいので、pythonのメソッドとして定義する。
 
@@ -103,9 +112,8 @@ def as_array(x):
         return np.array(x)
     return x
 
-x = Variable(np.array(0.5))
-y = square(exp(square(x)))
-# 逆伝播
-y.backward()
-print(x.grad)
-
+xs = [Variable(np.array(2)), Variable(np.array(3))] # リストとして準備
+f = Add()
+ys = f(xs)
+y = ys[0]
+print(y.data)
